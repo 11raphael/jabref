@@ -1,4 +1,10 @@
-package org.jabref.logic.util.io;
+package org.jabref.logic.util;
+
+import org.jabref.logic.util.io.FileUtil;
+
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * This class is based on http://stackoverflow.com/a/5626340/873282
@@ -7,7 +13,7 @@ package org.jabref.logic.util.io;
  *
  * Regarding the maximum length, see {@link FileUtil#getValidFileName(String)}
  */
-public class FileNameCleaner {
+class FileNameCleaner {
 
     private FileNameCleaner() {
     }
@@ -20,8 +26,10 @@ public class FileNameCleaner {
      * @param input the string to clean
      * @return a string with LaTeX commands removed
      */
-    private static String stripLatexCommands(String input) {
-        if (input == null) return "";
+    static String stripLatexCommands(String input) {
+        if (input == null) {
+            return "";
+        }
 
         // Remove LaTeX commands with curly braces, e.g., \textbf{Hello}
         String noCommands = input.replaceAll("\\\\[a-zA-Z]+\\{([^}]*)\\}", "$1");
@@ -43,7 +51,9 @@ public class FileNameCleaner {
      * @return a clean filename
      */
     public static String cleanFileName(String badFileName) {
-        if (badFileName == null) return "";
+        if (badFileName == null) {
+            return "";
+        }
 
         badFileName = stripLatexCommands(badFileName); // Remove LaTeX commands
 
@@ -68,7 +78,9 @@ public class FileNameCleaner {
      * @return a clean filename
      */
     public static String cleanDirectoryName(String badFileName) {
-        if (badFileName == null) return "";
+        if (badFileName == null) {
+            return "";
+        }
 
         badFileName = stripLatexCommands(badFileName); // Remove LaTeX commands
 
@@ -82,5 +94,55 @@ public class FileNameCleaner {
             }
         }
         return cleanName.toString().trim();
+    }
+}
+
+class FileNameCleanerTests {
+
+    @Test
+    void stripLatexCommandsTest() {
+        // Test case from the issue: \mkbibquote{Community}
+        assertEquals("Building Community",
+                FileNameCleaner.stripLatexCommands("Building \\mkbibquote{Community}"));
+
+        // Test other common LaTeX commands
+        assertEquals("Bold text",
+                FileNameCleaner.stripLatexCommands("\\textbf{Bold} text"));
+        assertEquals("Emphasized text",
+                FileNameCleaner.stripLatexCommands("\\emph{Emphasized} text"));
+
+        // Test nested commands
+        assertEquals("Nested content",
+                FileNameCleaner.stripLatexCommands("\\textbf{\\emph{Nested} content}"));
+
+        // Test multiple commands in one string
+        assertEquals("Multiple commands in text",
+                FileNameCleaner.stripLatexCommands("\\textbf{Multiple} commands in \\emph{text}"));
+
+        // Test standalone commands without braces
+        assertEquals("text",
+                FileNameCleaner.stripLatexCommands("\\LaTeX text"));
+
+        // Test curly braces without commands (should be removed)
+        assertEquals("Plain text with content",
+                FileNameCleaner.stripLatexCommands("Plain text with {content}"));
+
+        // Test command with empty content
+        assertEquals("Empty content",
+                FileNameCleaner.stripLatexCommands("Empty content \\textbf{}"));
+
+        // Test null input
+        assertEquals("", FileNameCleaner.stripLatexCommands(null));
+
+        // Test empty string
+        assertEquals("", FileNameCleaner.stripLatexCommands(""));
+
+        // Test whitespace handling
+        assertEquals("Spaces should be preserved",
+                FileNameCleaner.stripLatexCommands("Spaces should be preserved"));
+
+        // Test the exact example from the issue
+        assertEquals("Building Community",
+                FileNameCleaner.stripLatexCommands("Building \\mkbibquote{Community}"));
     }
 }
