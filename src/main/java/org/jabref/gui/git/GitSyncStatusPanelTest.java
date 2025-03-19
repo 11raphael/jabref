@@ -1,9 +1,5 @@
 package org.jabref.gui.git;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
-import java.io.File;
 import java.io.IOException;
 
 import javax.swing.JLabel;
@@ -14,11 +10,15 @@ import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
-import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
-import org.mockito.Mockito;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.when;
 
 public class GitSyncStatusPanelTest {
     private GitSyncStatusPanel syncStatusPanel;
@@ -68,7 +68,7 @@ public class GitSyncStatusPanelTest {
         when(repoMock.resolve("refs/remotes/origin/main")).thenReturn(remoteCommit);
         when(gitMock.getRepository()).thenReturn(repoMock);
         when(revWalk.parseCommit(any())).thenReturn(revCommit);
-        when(revWalk.next()).thenReturn(revCommit, (RevCommit) null);
+        when(revWalk.next()).thenReturn(revCommit, null);
 
         try (MockedStatic<RevWalk> revWalkMock = mockStatic(RevWalk.class)) {
             revWalkMock.when(() -> new RevWalk(repoMock)).thenReturn(revWalk);
@@ -114,7 +114,7 @@ public class GitSyncStatusPanelTest {
         when(repoMock.resolve("refs/remotes/origin/main")).thenReturn(remoteCommit);
         when(gitMock.getRepository()).thenReturn(repoMock);
         when(revWalk.parseCommit(any())).thenReturn(revCommit);
-        when(revWalk.next()).thenReturn(revCommit, revCommit, (RevCommit) null);
+        when(revWalk.next()).thenReturn(revCommit, revCommit, null);
 
         try (MockedStatic<RevWalk> revWalkMock = mockStatic(RevWalk.class)) {
             revWalkMock.when(() -> new RevWalk(repoMock)).thenReturn(revWalk);
@@ -122,6 +122,7 @@ public class GitSyncStatusPanelTest {
             assertEquals("⚠ Diverged: Local and remote branches have different changes.", status);
         }
     }
+
     @Test
     void testErrorHandling() {
         try (MockedStatic<Git> gitMock = mockStatic(Git.class)) {
@@ -129,6 +130,6 @@ public class GitSyncStatusPanelTest {
             syncStatusPanel.updateSyncStatus();
             JLabel label = (JLabel) syncStatusPanel.getComponent(0);
             assertEquals("❌ Error checking sync state", label.getText());
-        }
-    }
+        }
+    }
 }

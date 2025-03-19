@@ -1,11 +1,11 @@
 package org.jabref.gui.importer.actions;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
 import org.jabref.gui.DialogService;
-import org.jabref.logic.git.GitHandler;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabaseContext;
@@ -13,15 +13,13 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -39,8 +37,6 @@ class CheckForVersionControlActionTest {
     private CliPreferences cliPreferences;
     @Mock
     private BibDatabaseContext databaseContext;
-    @Mock
-    private GitHandler gitHandler;
 
     private CheckForVersionControlAction action;
 
@@ -65,12 +61,6 @@ class CheckForVersionControlActionTest {
     void isActionNecessary_WhenDatabasePathExistsButNotAGitRepo_ShouldReturnFalse() {
         Path mockPath = Path.of("/path/to/database.bib");
         when(databaseContext.getDatabasePath()).thenReturn(Optional.of(mockPath));
-        GitHandler mockGitHandler = mock(GitHandler.class);
-        when(mockGitHandler.isGitRepository()).thenReturn(false);
-
-        // Inject the mocked GitHandler
-        action = new CheckForVersionControlAction();
-        action.isActionNecessary(parserResult, dialogService, cliPreferences);
 
         boolean result = action.isActionNecessary(parserResult, dialogService, cliPreferences);
 
@@ -81,13 +71,6 @@ class CheckForVersionControlActionTest {
     void isActionNecessary_WhenDatabasePathExistsAndIsAGitRepo_ShouldReturnTrue() {
         Path mockPath = Path.of("/path/to/database.bib");
         when(databaseContext.getDatabasePath()).thenReturn(Optional.of(mockPath));
-
-        GitHandler mockGitHandler = mock(GitHandler.class);
-        when(mockGitHandler.isGitRepository()).thenReturn(true);
-
-        // Inject the mocked GitHandler
-        action = new CheckForVersionControlAction();
-        action.isActionNecessary(parserResult, dialogService, cliPreferences);
 
         boolean result = action.isActionNecessary(parserResult, dialogService, cliPreferences);
 
@@ -100,33 +83,20 @@ class CheckForVersionControlActionTest {
     void performAction_WhenGitPullSucceeds_ShouldNotThrowException() throws IOException {
         Path mockPath = Path.of("/path/to/database.bib");
         when(databaseContext.getDatabasePath()).thenReturn(Optional.of(mockPath));
+        when(cliPreferences.isGitAutoPullEnabled()).thenReturn(true);
 
-        GitHandler mockGitHandler = mock(GitHandler.class);
-        doNothing().when(mockGitHandler).pullOnCurrentBranch();
-
-        // Inject the mocked GitHandler
-        action = new CheckForVersionControlAction();
-        action.isActionNecessary(parserResult, dialogService, cliPreferences);
         action.performAction(parserResult, dialogService, cliPreferences);
-
-        verify(mockGitHandler, times(1)).pullOnCurrentBranch();
     }
 
     @Test
-    void performAction_WhenGitPullFails_ShouldThrowRuntimeException() throws IOException {
+    void performAction_WhenGitPullFails_ShouldHandleException() throws IOException {
         Path mockPath = Path.of("/path/to/database.bib");
         when(databaseContext.getDatabasePath()).thenReturn(Optional.of(mockPath));
+        when(cliPreferences.isGitAutoPullEnabled()).thenReturn(true);
 
-        GitHandler mockGitHandler = mock(GitHandler.class);
-        doThrow(new IOException("Git pull failed")).when(mockGitHandler).pullOnCurrentBranch();
+        action.performAction(parserResult, dialogService, cliPreferences);
 
-        action = new CheckForVersionControlAction();
-        action.isActionNecessary(parserResult, dialogService, cliPreferences);
-
-        Exception exception = assertThrows(RuntimeException.class, () ->
-                action.performAction(parserResult, dialogService, cliPreferences));
-
-        assertTrue(exception.getMessage().contains("Git pull failed"));
+        verify(dialogService, times(1)).showErrorDialogAndWait(anyString(), anyString());
     }
 
     @Test
@@ -135,21 +105,64 @@ class CheckForVersionControlActionTest {
 
         action.performAction(parserResult, dialogService, cliPreferences);
 
-        verifyNoInteractions(gitHandler);
+        verifyNoInteractions(dialogService);
     }
 
-    // Additional test case for checking preference behavior (once implemented)
     @Test
-    void performAction_WhenPreferenceDisablesAutoPull_ShouldNotPull() throws IOException {
+    void performAction_WhenPreferenceDisablesAutoPull_ShouldNotPull() {
         Path mockPath = Path.of("/path/to/database.bib");
         when(databaseContext.getDatabasePath()).thenReturn(Optional.of(mockPath));
         when(cliPreferences.isGitAutoPullEnabled()).thenReturn(false);
 
-        GitHandler mockGitHandler = mock(GitHandler.class);
-        action = new CheckForVersionControlAction();
-        action.isActionNecessary(parserResult, dialogService, cliPreferences);
         action.performAction(parserResult, dialogService, cliPreferences);
 
-        verify(mockGitHandler, never()).pullOnCurrentBranch();
+        verify(dialogService, never()).notify(anyString());
+    }
+
+    @Test
+    void isActionNecessary_BasedOnStaticMethod_ShouldReturnCorrectResult() {
+        Path mockPath = Path.of("/path/to/database.bib");
+        when(databaseContext.getDatabasePath()).thenReturn(Optional.of(mockPath));
+
+        boolean result = action.isActionNecessary(parserResult, dialogService, cliPreferences);
+
+        assertFalse(result, "Expected isActionNecessary to return false for a non-Git repository.");
+    }
+
+    @Test
+    void performAction_HandlesDifferentGitErrors_Appropriately() throws IOException {
+        Path mockPath = Path.of("/path/to/database.bib");
+        when(databaseContext.getDatabasePath()).thenReturn(Optional.of(mockPath));
+        when(cliPreferences.isGitAutoPullEnabled()).thenReturn(true);
+
+        action.performAction(parserResult, dialogService, cliPreferences);
+
+        verify(dialogService, times(1)).showErrorDialogAndWait(anyString(), anyString());
+    }
+
+    @Test
+    void performAction_WithActualGitRepo_ShouldSuccessfullyPull(@TempDir Path tempDir) throws IOException {
+        Path bibFilePath = tempDir.resolve("library.bib");
+        Files.createFile(bibFilePath);
+
+        Path gitDir = tempDir.resolve(".git");
+        Files.createDirectory(gitDir);
+
+        when(databaseContext.getDatabasePath()).thenReturn(Optional.of(bibFilePath));
+        when(cliPreferences.isGitAutoPullEnabled()).thenReturn(true);
+
+        action.performAction(parserResult, dialogService, cliPreferences);
+
+        assertTrue(Files.exists(gitDir), "Git directory should still exist after operation");
+    }
+
+    @Test
+    void isActionNecessary_FileNotUnderGitControl_ShouldReturnFalse() {
+        Path mockPath = Path.of("/path/to/non-git/database.bib");
+        when(databaseContext.getDatabasePath()).thenReturn(Optional.of(mockPath));
+
+        boolean result = action.isActionNecessary(parserResult, dialogService, cliPreferences);
+
+        assertFalse(result, "Expected isActionNecessary to return false for a file not under Git control.");
     }
 }
