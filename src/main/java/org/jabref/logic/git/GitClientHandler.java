@@ -23,9 +23,7 @@ import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 public class GitClientHandler extends GitHandler {
    private final static String GENERAL_ERROR_MESSAGE = Localization.lang("This Git operation failed") + "\n\n" +
         Localization.lang("MOST LIKELY CAUSE: Missing Git credentials.") + "\n" +
-        Localization.lang("Please set your credentials by either:") + "\n" +
-        "1. " + Localization.lang("Setting GIT_EMAIL and GIT_PW environment variables") + ", " + Localization.lang("or") + "\n" +
-        "2. " + Localization.lang("Configuring them in JabRef Preferences") + "\n\n" +
+        Localization.lang("Please set your credentials by entering your username and a personal access token generated for your account") + "\n" + "\n" +
         Localization.lang("Other possible causes:") + "\n" +
         "- " + Localization.lang("Network connectivity issues") + "\n" +
         "- " + Localization.lang("Remote repository rejecting the operation") +
@@ -142,8 +140,7 @@ public class GitClientHandler extends GitHandler {
 
         if (!isGitRepository()) {
             handleNonGitRepoOperation();
-        }
-        if (pullOnCurrentBranch()) {
+        } else if (pullOnCurrentBranch()) {
             notificationService.notify(Localization.lang("Successfully pulled from remote repository"));
         } else {
            showGeneralErrorDialog();
@@ -155,18 +152,18 @@ public class GitClientHandler extends GitHandler {
             handleNonGitRepoOperation();
             return;
         }
-            boolean commitCreated = this.createCommitOnCurrentBranch(Localization.lang("Automatic update via JabRef"), false);
-            if (!commitCreated) {
-               showGeneralErrorDialog();
-                return;
-            }
-            boolean successPush = pushCommitsToRemoteRepository();
-            if (successPush) {
-                notificationService.notify(Localization.lang("Successfully Pushed changes to remote repository"));
-            } else {
-               showGeneralErrorDialog();
-            }
+        boolean commitCreated = this.createCommitOnCurrentBranch(Localization.lang("Automatic update via JabRef"), false);
+        if (!commitCreated) {
+            showGeneralErrorDialog();
+            return;
         }
+        boolean successPush = pushCommitsToRemoteRepository();
+        if (successPush) {
+            notificationService.notify(Localization.lang("Successfully Pushed changes to remote repository"));
+        } else {
+            showGeneralErrorDialog();
+        }
+    }
 
     public void handleNonGitRepoOperation() {
         LOGGER.info("Not a git repository at path: {}", repositoryPath);

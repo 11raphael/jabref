@@ -50,11 +50,8 @@ public class GitPushAction extends SimpleCommand {
                 preferences);
         try {
             gitClientHandler.checkGitRepoThenCommitAndPushAndDisplayMsg();
-        } catch (IOException e) {
-            LOGGER.error("Error while checking git repo", e);
-            dialogService.showErrorDialogAndWait(Localization.lang("Git Push Failed"),
-                    Localization.lang("Failed to push changes: {0}", e.getMessage()));
-        } catch (GitAPIException e) {
+        } catch (IOException |
+                GitAPIException e) {
             LOGGER.error("Error while checking git repo", e);
             dialogService.showErrorDialogAndWait(Localization.lang("Git Push Failed"),
                     Localization.lang("Failed to push changes: {0}", e.getMessage()));
