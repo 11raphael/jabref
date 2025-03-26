@@ -337,9 +337,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
             validator.addValidators(customPathToThemeValidator);
         }
 
-        validator.addValidators(gitHubUsernameValidator);
-        validator.addValidators(gitHubPasskeyValidator);
-
         ValidationStatus validationStatus = validator.getValidationStatus();
         if (!validationStatus.isValid()) {
             validationStatus.getHighestMessage().ifPresent(message ->

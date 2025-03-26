@@ -158,8 +158,6 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
             validationVisualizer.initVisualization(viewModel.remotePortValidationStatus(), remotePort);
             validationVisualizer.initVisualization(viewModel.fontSizeValidationStatus(), fontSize);
             validationVisualizer.initVisualization(viewModel.customPathToThemeValidationStatus(), customThemePath);
-            validationVisualizer.initVisualization(viewModel.gitHubUsernameValidationStatus(), gitHubUsernameField);
-            validationVisualizer.initVisualization(viewModel.gitHubPasskeyValidationStatus(), gitHubPasskeyField);
         });
 
         remoteServer.selectedProperty().bindBidirectional(viewModel.remoteServerProperty());

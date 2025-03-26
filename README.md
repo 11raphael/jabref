@@ -5,7 +5,7 @@
 Authors:
 - [All JabRef Contributors](https://github.com/JabRef/jabref/graphs/contributors)
 - [Raphael Ahiable](https://github.com/11raphael)
-- [Sihas Abeywickrama](https://github.com/SihasA)
+- [Sihas Abeywickrama](https://github.com/SihasA) (1 commit under [DimplyMuffin](https://github.com/DimplyMuffin))
 - [Jiewu Deng](https://github.com/wtfjjking)
 - [Arjan Bedi](https://github.com/rapidshotzz) 
 - [Argya Pramusakti](https://github.com/arp-23)
@@ -18,17 +18,11 @@ JabRef is open-source software; hence, many files were changed and not created d
 With this in mind, we have opted to include in this README the segments of code in the files that we changed and added (*marked respectively*), along with a list of modified and added code for each file.
 
 ## Raphael's Files
-### GitHandler.java (*modified*)
-- GitHandler()
-  - Added optional boolean parameter to constructor to prevent a new repository from being initialized on constructor call. (This is to not break the existing GitHandler usage, particularly in the JabRef SLR feature.)
-- Added getRepository() 
-  - returns a Repository object for the repository stored by this GitHandler instance.
+### GitHandler.java 
+- *change to be added*
 
-### GitClientHandler.java (*new file*)
-- Added GitClientHandler
-  - New class which extends from GitHandler to separate concerns.
-  - Contains logic for client actions with git.
-    - Such as: http authentication, post-save database action
+### GitClientHandler.java (*added*)
+- *change to be added*
 
 ### SaveDatabaseAction.java
 - *change to be added*
@@ -73,29 +67,27 @@ With this in mind, we have opted to include in this README the segments of code 
 
 
 ## Sihas's Files
-### MainMenu.java
-- *change to be added*
+### MainMenu.java (*modified*)
+- Added new code to this file, used existing formatting for menu item code in the same file, and edited accordingly.
 
-### GeneralTab.fxml
-- *change to be added*
+### GeneralTab.fxml (*modified*)
+- Added front-end code for preferences, used existing code as a standard to create HBox instances, and changed it appropriately.
 
-### GeneralTab.java
-- *change to be added*
+### GeneralTab.java (*modified*)
+- Added code using existing code as a template for setup and localisation for the preference checkbox and prompts.
 
-### GeneralTabViewModel.java
-- *change to be added*
+### GeneralTabViewModel.java (*modified*)
+- Added simple boolean/ string properties to store preferences.
 
-### JabRef_en.properties
-- *change to be added*
+### JabRef_en.properties (*modified*)
+- Added all necessary localisation.
 
 ## Tests
-
-### GitHandlerTest.java
-- *change to be added*
-
-### GitPreferencesTest.java
-- *change to be added*
-
-### GitStatusTesterTest.java
-- *change to be added*
+Note:- JabRef has stated that they do not expect testing to be done for GUI components.
+- GitHandlerTest.java
+- GitPullActionTest.java
+- GitPushActionTest.java
+- GitPreferencesTest.java
+- GitStatusTesterTest.java
+- CheckForVersionControlActionEndToEndTest.java
 
