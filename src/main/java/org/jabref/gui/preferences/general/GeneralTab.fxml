@@ -14,6 +14,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import org.jabref.gui.icon.JabRefIconView?>
+<?import org.controlsfx.control.textfield.CustomPasswordField?>
 <fx:root spacing="10.0" type="VBox"
          xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
          fx:controller="org.jabref.gui.preferences.general.GeneralTab">
@@ -129,7 +130,7 @@
 
     <HBox spacing="10">
         <Label text="Git Personal Access Token:"/>
-        <TextField fx:id="gitHubPasskeyField" promptText="Enter your PAT here"/>
+        <CustomPasswordField fx:id="gitHubPasskeyField" promptText="Enter your PAT here"/>
     </HBox>
     <HBox alignment="CENTER_LEFT" spacing="4.0">
         <CheckBox fx:id="autoPushCheckbox" text="Auto push on save"/>

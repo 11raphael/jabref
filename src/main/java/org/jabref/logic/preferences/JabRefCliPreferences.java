@@ -1832,7 +1832,7 @@ public class JabRefCliPreferences implements CliPreferences {
         boolean autoPushEnabled = getBoolean("gitAutoPushEnabled", false);
 
         String gitHubUsername = get("gitHubUsername", "");
-        String gitHubPasskey = get("gitHubPasskey", "");
+        String gitHubPasskey = getGitPasskey();
 
         gitPreferences = new GitPreferences(autoPushEnabled, gitHubUsername, gitHubPasskey);
 
@@ -1845,10 +1845,39 @@ public class JabRefCliPreferences implements CliPreferences {
         );
 
         EasyBind.listen(gitPreferences.gitHubPasskeyProperty(), (obs, oldValue, newValue) ->
-                putString("gitHubPasskey", newValue)
+                setGitPasskey(newValue)
         );
 
         return gitPreferences;
+    }
+
+    private void setGitPasskey(String password) {
+        try (final Keyring keyring = Keyring.create()) {
+            if (StringUtil.isBlank(password)) {
+                keyring.deletePassword("org.jabref", "git-http");
+            } else {
+                keyring.setPassword("org.jabref", "git-http", new Password(
+                        password.trim(),
+                        getInternalPreferences().getUserAndHost())
+                        .encrypt());
+            }
+        } catch (Exception ex) {
+            LOGGER.warn("Unable to open key store", ex);
+        }
+    }
+
+    private String getGitPasskey() {
+        try (final Keyring keyring = Keyring.create()) {
+            return new Password(
+                    keyring.getPassword("org.jabref", "git-http"),
+                    getInternalPreferences().getUserAndHost())
+                    .decrypt();
+        } catch (PasswordAccessException ex) {
+            LOGGER.warn("JabRef uses proxy password from key store but no password is stored");
+        } catch (Exception ex) {
+            LOGGER.warn("JabRef could not open the key store", ex);
+        }
+        return "";
     }
 
     private void putString(String key, String value) {
