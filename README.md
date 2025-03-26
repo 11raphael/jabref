@@ -18,11 +18,17 @@ JabRef is open-source software; hence, many files were changed and not created d
 With this in mind, we have opted to include in this README the segments of code in the files that we changed and added (*marked respectively*), along with a list of modified and added code for each file.
 
 ## Raphael's Files
-### GitHandler.java
-- *change to be added*
+### GitHandler.java (*modified*)
+- GitHandler()
+  - Added optional boolean parameter to constructor to prevent a new repository from being initialized on constructor call. (This is to not break the existing GitHandler usage, particularly in the JabRef SLR feature.)
+- Added getRepository() 
+  - returns a Repository object for the repository stored by this GitHandler instance.
 
-### GitClientHandler.java
-- *change to be added*
+### GitClientHandler.java (*new file*)
+- Added GitClientHandler
+  - New class which extends from GitHandler to separate concerns.
+  - Contains logic for client actions with git.
+    - Such as: http authentication, post-save database action
 
 ### SaveDatabaseAction.java
 - *change to be added*

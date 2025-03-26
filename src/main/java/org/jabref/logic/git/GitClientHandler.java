@@ -2,31 +2,22 @@ package org.jabref.logic.git;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.StringReader;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.util.Optional;
 
-import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.service.NotificationService;
-import org.jabref.model.database.BibDatabaseContext;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ResetCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.ObjectId;
-import org.eclipse.jgit.lib.ObjectReader;
-import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.lib.RepositoryState;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
-import org.eclipse.jgit.treewalk.TreeWalk;
 
 public class GitClientHandler extends GitHandler {
    private final static String GENERAL_ERROR_MESSAGE = Localization.lang("This Git operation failed") + "\n\n" +
@@ -59,8 +50,9 @@ public class GitClientHandler extends GitHandler {
     /**
      * Contains logic for commiting and pushing after a database is saved locally,
      * if the relevant preferences are present.<p>
-     * A git commit is created and a 'git pull --rebase' is executed. In the case of
+     * A git commit is created, a pull is executed and then changes are pushed. In the case of
      * an error, the repository is reverted to the commit and a regular pull is executed.
+     *
      */
     public void postSaveDatabaseAction() {
         if (isGitRepository() &&
@@ -142,60 +134,6 @@ public class GitClientHandler extends GitHandler {
             LOGGER.error("Failed to get latest commit");
         }
         return null;
-    }
-
-    private String getFileContents(RevCommit commit, String path) throws IOException {
-        try {
-            Repository repository = new FileRepositoryBuilder()
-                    .setGitDir(this.repositoryPathAsFile)
-                    .build();
-
-            TreeWalk treeWalk = TreeWalk.forPath(repository, path, commit.getTree());
-            if (treeWalk != null) {
-                ObjectId objectId = treeWalk.getObjectId(0);
-                try (ObjectReader reader = repository.newObjectReader()) {
-                    return new String(reader.open(objectId).getBytes(), StandardCharsets.UTF_8);
-                }
-            }
-        } catch (IOException e) {
-            LOGGER.error("Failed to get file contents");
-        }
-        return null;
-    }
-
-    private RevCommit findMergeBase(RevCommit commit1, RevCommit commit2) throws IOException {
-        Repository repository = new FileRepositoryBuilder()
-                .setGitDir(this.repositoryPathAsFile)
-                .build();
-
-        try (RevWalk revWalk = new RevWalk(repository)) {
-            revWalk.markStart(commit1);
-            revWalk.markStart(commit2);
-
-            for (RevCommit commit : revWalk) {
-                return commit;
-            }
-        }
-        return null;
-    }
-
-    private BibDatabaseContext parseBibString(String bibtexContent) throws IOException {
-        try (StringReader reader = new StringReader(bibtexContent)) {
-            ParserResult result = new BibtexParser(this.preferences.getImportFormatPreferences()).parse(reader);
-            return result.getDatabaseContext();
-        }
-    }
-
-    private Optional<Ref> getHeadRef() throws IOException, GitAPIException {
-        return this.getRefForBranch(this.getCurrentlyCheckedOutBranch());
-    }
-
-    private void revertToCommit(Ref commit) throws IOException, GitAPIException {
-        Git git = Git.open(this.repositoryPathAsFile);
-        git.reset()
-           .setMode(ResetCommand.ResetType.SOFT)
-           .setRef(commit.toString())
-           .call();
     }
 
     public void showGeneralErrorDialog() {
