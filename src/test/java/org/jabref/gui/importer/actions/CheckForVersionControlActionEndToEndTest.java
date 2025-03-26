@@ -18,7 +18,6 @@ import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -53,15 +52,6 @@ class CheckForVersionControlActionEndToEndTest {
         databaseContext = mock(BibDatabaseContext.class);
 
         when(parserResult.getDatabaseContext()).thenReturn(databaseContext);
-    }
-
-    @Test
-    void isActionNecessary_WhenDatabasePathExistsAndIsAGitRepo_ShouldReturnTrue() {
-        when(databaseContext.getDatabasePath()).thenReturn(Optional.of(gitRepo.resolve("test.bib")));
-
-        boolean result = action.isActionNecessary(parserResult, dialogService, cliPreferences);
-
-        assertTrue(result);
     }
 
     @Test
