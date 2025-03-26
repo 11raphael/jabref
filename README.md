@@ -17,58 +17,26 @@ JabRef is open-source software; hence, many files were changed and not created d
 
 With this in mind, we have opted to include in this README the segments of code in the files that we changed and added (*marked respectively*), along with a list of modified and added code for each file.
 
+## Raphael's Files
 ### GitHandler.java
 - *change to be added*
 
 ### GitClientHandler.java
 - *change to be added*
 
-### LibraryTab.java
-- *change to be added*
-
-### StandardActions.java
-- *change to be added*
-
 ### SaveDatabaseAction.java
-- *change to be added*
-
-### MainMenu.java
-- *change to be added*
-
-### CheckForVersionControlAction.java
 - *change to be added*
 
 ### OpenDatabaseAction.java
 - *change to be added*
 
-### GeneralTab.fxml
-- *change to be added*
-
-### GeneralTab.java
-- *change to be added*
-
-### GeneralTabViewModel.java
-- *change to be added*
-
-### DialogNotificationService.java
+### CheckForVersionControlAction.java
 - *change to be added*
 
 ### GitPullAction.java
 - *change to be added*
 
 ### GitPushAction.java
-- *change to be added*
-
-### ConflictDetector.java
-- *change to be added*
-
-### ConflictResolution.java
-- *change to be added*
-
-### GitBibDatabaseDiff.java
-- *change to be added*
-
-### GitBibEntryDiff.java
 - *change to be added*
 
 ### GitPreferences.java
@@ -80,16 +48,53 @@ With this in mind, we have opted to include in this README the segments of code 
 ### JabRefCliPreferences.java
 - *change to be added*
 
+
+## Jiewu's Files
+### LibraryTab.java
+- *change to be added*
+
+### StandardActions.java
+- *change to be added*
+
+### DialogNotificationService.java
+- *change to be added*
+
 ### NotificationService.java
 - *change to be added*
 
 ### BibDatabaseContext.java
 - *change to be added*
 
+
+## Sihas's Files
+### MainMenu.java
+- *change to be added*
+
+### GeneralTab.fxml
+- *change to be added*
+
+### GeneralTab.java
+- *change to be added*
+
+### GeneralTabViewModel.java
+- *change to be added*
+
 ### JabRef_en.properties
 - *change to be added*
 
-### CheckForVersionControlActionEndToEndTest.java
+
+
+## To Remove
+### ConflictDetector.java
+- *change to be added*
+
+### ConflictResolution.java
+- *change to be added*
+
+### GitBibDatabaseDiff.java
+- *change to be added*
+
+### GitBibEntryDiff.java
 - *change to be added*
 
 ### ConflictDetectorTest.java
@@ -103,6 +108,16 @@ With this in mind, we have opted to include in this README the segments of code 
 
 ### GitBibEntryDiffTest.java
 - *change to be added*
+
+### CheckForVersionControlActionEndToEndTest.java
+- *change to be added*
+
+
+
+
+
+
+## Tests
 
 ### GitHandlerTest.java
 - *change to be added*
