@@ -82,48 +82,12 @@ With this in mind, we have opted to include in this README the segments of code 
 ### JabRef_en.properties (*modified*)
 - Added all necessary localisation.
 
-
-
-## To Remove
-### ConflictDetector.java
-- *change to be added*
-
-### ConflictResolution.java
-- *change to be added*
-
-### GitBibDatabaseDiff.java
-- *change to be added*
-
-### GitBibEntryDiff.java
-- *change to be added*
-
-### ConflictDetectorTest.java
-- *change to be added*
-
-### ConflictResolutionTest.java
-- *change to be added*
-
-### GitBibDatabaseDiffTest.java
-- *change to be added*
-
-### GitBibEntryDiffTest.java
-- *change to be added*
-
-### CheckForVersionControlActionEndToEndTest.java
-- *change to be added*
-
-
-
-
-
-
 ## Tests
+Note:- JabRef has stated that they do not expect testing to be done for GUI components.
+- GitHandlerTest.java
+- GitPullActionTest.java
+- GitPushActionTest.java
+- GitPreferencesTest.java
+- GitStatusTesterTest.java
+- CheckForVersionControlActionEndToEndTest.java
 
-### GitHandlerTest.java
-- *change to be added*
-
-### GitPreferencesTest.java
-- *change to be added*
-
-### GitStatusTesterTest.java
-- *change to be added*
