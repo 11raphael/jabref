@@ -37,3 +37,79 @@ With this in mind, we have opted to include in this README the segments of code 
 
 ### CheckForVersionControlAction.java
 - *change to be added*
+
+### OpenDatabaseAction.java
+- *change to be added*
+
+### GeneralTab.fxml
+- *change to be added*
+
+### GeneralTab.java
+- *change to be added*
+
+### GeneralTabViewModel.java
+- *change to be added*
+
+### DialogNotificationService.java
+- *change to be added*
+
+### GitPullAction.java
+- *change to be added*
+
+### GitPushAction.java
+- *change to be added*
+
+### ConflictDetector.java
+- *change to be added*
+
+### ConflictResolution.java
+- *change to be added*
+
+### GitBibDatabaseDiff.java
+- *change to be added*
+
+### GitBibEntryDiff.java
+- *change to be added*
+
+### GitPreferences.java
+- *change to be added*
+
+### CliPreferences.java
+- *change to be added*
+
+### JabRefCliPreferences.java
+- *change to be added*
+
+### NotificationService.java
+- *change to be added*
+
+### BibDatabaseContext.java
+- *change to be added*
+
+### JabRef_en.properties
+- *change to be added*
+
+### CheckForVersionControlActionEndToEndTest.java
+- *change to be added*
+
+### ConflictDetectorTest.java
+- *change to be added*
+
+### ConflictResolutionTest.java
+- *change to be added*
+
+### GitBibDatabaseDiffTest.java
+- *change to be added*
+
+### GitBibEntryDiffTest.java
+- *change to be added*
+
+### GitHandlerTest.java
+- *change to be added*
+
+### GitPreferencesTest.java
+- *change to be added*
+
+### GitStatusTesterTest.java
+- *change to be added*
+
