@@ -89,6 +89,10 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty createBackupProperty = new SimpleBooleanProperty();
     private final StringProperty backupDirectoryProperty = new SimpleStringProperty("");
 
+    private final BooleanProperty autoPushEnabledProperty = new SimpleBooleanProperty();
+    private final StringProperty gitHubUsernameProperty = new SimpleStringProperty("");
+    private final StringProperty gitHubPasskeyProperty = new SimpleStringProperty("");
+
     private final DialogService dialogService;
     private final GuiPreferences preferences;
     private final WorkspacePreferences workspacePreferences;
@@ -99,6 +103,8 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
     private final Validator fontSizeValidator;
     private final Validator customPathToThemeValidator;
+    private final Validator gitHubUsernameValidator;
+    private final Validator gitHubPasskeyValidator;
 
     private final List<String> restartWarning = new ArrayList<>();
     private final BooleanProperty remoteServerProperty = new SimpleBooleanProperty();
@@ -156,6 +162,16 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
                         Localization.lang("Remote operation"),
                         Localization.lang("You must enter an integer value in the interval 1025-65535"))));
 
+        gitHubUsernameValidator = new FunctionBasedValidator<>(
+                gitHubUsernameProperty,
+                input -> !StringUtil.isNullOrEmpty(input),
+                ValidationMessage.error(Localization.lang("Please specify a username")));
+
+        gitHubPasskeyValidator = new FunctionBasedValidator<>(
+                gitHubPasskeyProperty,
+                input -> !input.isBlank(),
+                ValidationMessage.error(Localization.lang("Please specify a password")));
+
         this.trustStoreManager = new TrustStoreManager(Path.of(preferences.getSSLPreferences().getTruststorePath()));
     }
 
@@ -198,9 +214,9 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         alwaysReformatBibProperty.setValue(libraryPreferences.shouldAlwaysReformatOnSave());
         autosaveLocalLibraries.setValue(libraryPreferences.shouldAutoSave());
 
-        autoPushEnabledProperty().setValue(gitPreferences.getAutoPushEnabled());
-        gitHubUsernameProperty().setValue(gitPreferences.getGitHubUsername());
-        gitHubPasskeyProperty().setValue(gitPreferences.getGitHubPasskey());
+        autoPushEnabledProperty.setValue(gitPreferences.getAutoPushEnabled());
+        gitHubUsernameProperty.setValue(gitPreferences.getGitHubUsername());
+        gitHubPasskeyProperty.setValue(gitPreferences.getGitHubPasskey());
 
         createBackupProperty.setValue(filePreferences.shouldCreateBackup());
         backupDirectoryProperty.setValue(filePreferences.getBackupDirectory().toString());
@@ -244,9 +260,9 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         libraryPreferences.setAlwaysReformatOnSave(alwaysReformatBibProperty.getValue());
         libraryPreferences.setAutoSave(autosaveLocalLibraries.getValue());
 
-        gitPreferences.setAutoPushEnabled(autoPushEnabledProperty().get());
-        gitPreferences.setGitHubUsername(gitHubUsernameProperty().get());
-        gitPreferences.setGitHubPasskey(gitHubPasskeyProperty().get());
+        gitPreferences.setAutoPushEnabled(autoPushEnabledProperty.getValue());
+        gitPreferences.setGitHubUsername(gitHubUsernameProperty.getValue());
+        gitPreferences.setGitHubPasskey(gitHubPasskeyProperty.getValue());
 
         filePreferences.createBackupProperty().setValue(createBackupProperty.getValue());
         filePreferences.backupDirectoryProperty().setValue(Path.of(backupDirectoryProperty.getValue()));
@@ -297,6 +313,14 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         return customPathToThemeValidator.getValidationStatus();
     }
 
+    public ValidationStatus gitHubUsernameValidationStatus() {
+        return gitHubUsernameValidator.getValidationStatus();
+    }
+
+    public ValidationStatus gitHubPasskeyValidationStatus() {
+        return gitHubPasskeyValidator.getValidationStatus();
+    }
+
     @Override
     public boolean validateSettings() {
         CompositeValidator validator = new CompositeValidator();
@@ -312,6 +336,9 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         if (selectedThemeProperty.getValue() == ThemeTypes.CUSTOM) {
             validator.addValidators(customPathToThemeValidator);
         }
+
+        validator.addValidators(gitHubUsernameValidator);
+        validator.addValidators(gitHubPasskeyValidator);
 
         ValidationStatus validationStatus = validator.getValidationStatus();
         if (!validationStatus.isValid()) {
@@ -453,14 +480,14 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     }
 
     public BooleanProperty autoPushEnabledProperty() {
-        return gitPreferences.getAutoPushEnabledProperty();
+        return autoPushEnabledProperty;
     }
 
     public StringProperty gitHubUsernameProperty() {
-        return gitPreferences.gitHubUsernameProperty();
+        return gitHubUsernameProperty;
     }
 
     public StringProperty gitHubPasskeyProperty() {
-        return gitPreferences.gitHubPasskeyProperty();
+        return gitHubPasskeyProperty;
     }
 }

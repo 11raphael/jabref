@@ -32,6 +32,7 @@ import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import jakarta.inject.Inject;
+import org.controlsfx.control.textfield.CustomPasswordField;
 
 public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> implements PreferencesTab {
 
@@ -54,7 +55,7 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
     @FXML private CheckBox autosaveLocalLibraries;
     @FXML private Button autosaveLocalLibrariesHelp;
     @FXML private TextField gitHubUsernameField;
-    @FXML private TextField gitHubPasskeyField;
+    @FXML private CustomPasswordField gitHubPasskeyField;
     @FXML private CheckBox autoPushCheckbox;
     @FXML private CheckBox createBackup;
     @FXML private TextField backupDirectory;
@@ -136,6 +137,10 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
         alwaysReformatBib.selectedProperty().bindBidirectional(viewModel.alwaysReformatBibProperty());
         autosaveLocalLibraries.selectedProperty().bindBidirectional(viewModel.autosaveLocalLibrariesProperty());
 
+        gitHubUsernameField.setPromptText(Localization.lang("GitHub Username"));
+        gitHubPasskeyField.setPromptText(Localization.lang("GitHub Passkey"));
+        autoPushCheckbox.setText(Localization.lang("Automatically push changes"));
+
         gitHubUsernameField.textProperty().bindBidirectional(viewModel.gitHubUsernameProperty());
         gitHubPasskeyField.textProperty().bindBidirectional(viewModel.gitHubPasskeyProperty());
 
@@ -153,6 +158,8 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
             validationVisualizer.initVisualization(viewModel.remotePortValidationStatus(), remotePort);
             validationVisualizer.initVisualization(viewModel.fontSizeValidationStatus(), fontSize);
             validationVisualizer.initVisualization(viewModel.customPathToThemeValidationStatus(), customThemePath);
+            validationVisualizer.initVisualization(viewModel.gitHubUsernameValidationStatus(), gitHubUsernameField);
+            validationVisualizer.initVisualization(viewModel.gitHubPasskeyValidationStatus(), gitHubPasskeyField);
         });
 
         remoteServer.selectedProperty().bindBidirectional(viewModel.remoteServerProperty());
