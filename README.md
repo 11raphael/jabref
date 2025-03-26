@@ -1,114 +1,115 @@
-# JabRef Bibliography Management [![APIdia](https://apidia.net/java/JabRef/main/badge.svg)](https://apidia.net/java/JabRef/main)
+# Adding simple git integration to JabRef
 
-JabRef is an open-source, cross-platform citation and reference management tool.
+## JabRef
 
-Stay on top of your literature: JabRef helps you to collect and organize sources, find the paper you need and discover the latest research.
+Authors:
+- [All JabRef Contributors](https://github.com/JabRef/jabref/graphs/contributors)
+- [Raphael Ahiable](https://github.com/11raphael)
+- [Sihas Abeywickrama](https://github.com/SihasA)
+- [Jiewu Deng](https://github.com/wtfjjking)
+- [Arjan Bedi](https://github.com/rapidshotzz) 
+- [Argya Pramusakti](https://github.com/arp-23)
+- [Aryaman Amit Mehta](https://github.com/Ary006)
+- [Yash Shukla](https://github.com/yshukla01)
 
-![main table](docs/images/jabref-mainscreen.png)
+## Our approach to referencing all leveraged code
+JabRef is open-source software; hence, many files were changed and not created directly by us. In most cases, the challenge was to review the existing implementation and produce a solution that does not conflict with what is already there. As a result, we have leveraged and changed many functions and files.
 
-## Features
+With this in mind, we have opted to include in this README the segments of code in the files that we changed and added (*marked respectively*), along with a list of modified and added code for each file.
 
-JabRef is available free of charge and is actively developed.
-It supports you in every step of your research work.
+### GitHandler.java
+- *change to be added*
 
-### Collect
+### GitClientHandler.java
+- *change to be added*
 
-- Search across many online scientific catalogues like CiteSeer, CrossRef, Google Scholar, IEEEXplore, INSPIRE-HEP, Medline PubMed, MathSciNet, Springer, arXiv, and zbMATH
-- Import options for over 15 reference formats
-- Easily retrieve and link full-text articles
-- Fetch complete bibliographic information based on ISBN, DOI, PubMed-ID and arXiv-ID
-- Extract metadata from PDFs
-- Import new references directly from the browser with one click using the [official browser extension](https://github.com/JabRef/JabRef-Browser-Extension) for [Firefox](https://addons.mozilla.org/en-US/firefox/addon/jabref/?src=external-github),  [Chrome](https://chrome.google.com/webstore/detail/jabref-browser-extension/bifehkofibaamoeaopjglfkddgkijdlh), [Edge](https://microsoftedge.microsoft.com/addons/detail/pgkajmkfgbehiomipedjhoddkejohfna), and [Vivaldi](https://chrome.google.com/webstore/detail/jabref-browser-extension/bifehkofibaamoeaopjglfkddgkijdlh)
+### LibraryTab.java
+- *change to be added*
 
-### Organize
+### StandardActions.java
+- *change to be added*
 
-- Group your research into hierarchical collections and organize research items based on keywords/tags, search terms, or your manual assignments
-- Advanced search and filter features
-- Complete and fix bibliographic data by comparing with curated online catalogs such as Google Scholar, Springer, or MathSciNet
-- Customizable citation key generator
-- Customize and add new metadata fields or reference types
-- Find and merge duplicates
-- Attach related documents: 20 different kinds of documents supported out of the box, completely customizable and extendable
-- Automatically rename and move associated documents according to customizable rules
-- Keep track of what you read: ranking, priority, printed, quality-assured
+### SaveDatabaseAction.java
+- *change to be added*
 
-### Cite
+### MainMenu.java
+- *change to be added*
 
-- Native BibTeX and Biblatex support
-- Cite-as-you-write functionality for external applications such as Emacs, Kile, LyX, Texmaker, TeXstudio, Vim and WinEdt.
-- Format references using one of thousands of built-in citation styles or create your own style
-- Support for Word and LibreOffice/OpenOffice for inserting and formatting citations
+### CheckForVersionControlAction.java
+- *change to be added*
 
-### Share
+### OpenDatabaseAction.java
+- *change to be added*
 
-- Many built-in export options or create your export format
-- Library is saved as a simple text file, and thus it is easy to share with others via Dropbox and is version-control friendly
-- Work in a team: sync the contents of your library via a SQL database
+### GeneralTab.fxml
+- *change to be added*
 
-## Installation
+### GeneralTab.java
+- *change to be added*
 
-Fresh development builds are available at [builds.jabref.org](https://builds.jabref.org/main/).
-The [latest stable release is available at FossHub](https://downloads.jabref.org/).
+### GeneralTabViewModel.java
+- *change to be added*
 
-Please see our [Installation Guide](https://docs.jabref.org/installation).
+### DialogNotificationService.java
+- *change to be added*
 
-## Bug Reports, Suggestions, Other Feedback
+### GitPullAction.java
+- *change to be added*
 
-[![Donation](https://img.shields.io/badge/donate%20to-jabref-orange.svg)](https://donations.jabref.org)
-[![PayPal Donate](https://img.shields.io/badge/donate-paypal-00457c.svg?logo=paypal&style=flat-square)](https://paypal.me/JabRef)
+### GitPushAction.java
+- *change to be added*
 
-We are thankful for any bug reports or other feedback.
-If you have ideas for new features you want to be included in JabRef, tell us in [the feature section](http://discourse.jabref.org/c/features) of our forum!
-If you need support in using JabRef, please read [the documentation](https://docs.jabref.org/) first, the [frequently asked questions (FAQ)](https://docs.jabref.org/faq) and also have a look at our [community forum](https://discourse.jabref.org/c/help/7).
-You can use our [GitHub issue tracker](https://github.com/JabRef/jabref/issues) to file bug reports.
+### ConflictDetector.java
+- *change to be added*
 
-An explanation of donation possibilities and usage of donations is available at our [donations page](https://donations.jabref.org).
+### ConflictResolution.java
+- *change to be added*
 
-## Contributing
+### GitBibDatabaseDiff.java
+- *change to be added*
 
-Want to be part of a free and open-source project that tens of thousands of researchers use every day?
-Please have a look at our [guidelines for contributing](CONTRIBUTING.md).
+### GitBibEntryDiff.java
+- *change to be added*
 
-## Research and Education
+### GitPreferences.java
+- *change to be added*
 
-JabRef welcomes research applied to it.
-The current list of papers where JabRef helped to enhance science is maintained at <https://github.com/JabRef/jabref/wiki/JabRef-in-the-Media>.
+### CliPreferences.java
+- *change to be added*
 
-The JabRef team also fosters to use JabRef in Software Engineering training.
-We offer guidelines for this at <https://devdocs.jabref.org/teaching.html>.
+### JabRefCliPreferences.java
+- *change to be added*
 
-When citing JabRef, please use the following citation:
+### NotificationService.java
+- *change to be added*
 
-```bibtex
-@Article{jabref,
-  author  = {Oliver Kopp and Carl Christian Snethlage and Christoph Schwentker},
-  title   = {JabRef: BibTeX-based literature management software},
-  journal = {TUGboat},
-  volume  = {44},
-  number  = {3},
-  pages   = {441--447},
-  doi     = {10.47397/tb/44-3/tb138kopp-jabref},
-  issn    = {0896-3207},
-  issue   = {138},
-  year    = {2023},
-}
-```
+### BibDatabaseContext.java
+- *change to be added*
 
-DOI (also includes [full text](https://tug.org/TUGboat/tb44-3/tb138kopp-jabref.pdf)): [10.47397/tb/44-3/tb138kopp-jabref](https://doi.org/10.47397/tb/44-3/tb138kopp-jabref).
+### JabRef_en.properties
+- *change to be added*
 
-## Sponsoring
+### CheckForVersionControlActionEndToEndTest.java
+- *change to be added*
 
-JabRef development is powered by YourKit Java Profiler  
-[![YourKit Java Profiler](https://www.yourkit.com/images/yk_logo.svg)](https://www.yourkit.com/java/profiler/)
+### ConflictDetectorTest.java
+- *change to be added*
 
-## ProductMap File Analysis Result
+### ConflictResolutionTest.java
+- *change to be added*
 
-This section contains an analysis of ProductMap files. Each file has a link to its source.
+### GitBibDatabaseDiffTest.java
+- *change to be added*
 
-| Github File | ProductMap File URL |
-|-------------|---------------------|
-| [src/main/java/org/jabref/gui/maintable/MainTableTooltip.java](https://github.com/JabRef/jabref/blob/main/src/main/java/org/jabref/gui/maintable/MainTableTooltip.java) | [View File](https://product-map.ai/app/public?url=https://github.com/JabRef/jabref/blob/main/src/main/java/org/jabref/gui/maintable/MainTableTooltip.java ) |
+### GitBibEntryDiffTest.java
+- *change to be added*
 
-### ProductMap - Contact Us
+### GitHandlerTest.java
+- *change to be added*
 
-For any inquiries, feel free to [contact ProductMap.ai](https://product-map.ai).
+### GitPreferencesTest.java
+- *change to be added*
+
+### GitStatusTesterTest.java
+- *change to be added*
+
