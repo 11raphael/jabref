@@ -22,3 +22,18 @@ With this in mind, we have opted to include in this README the segments of code 
 
 ### GitClientHandler.java
 - *change to be added*
+
+### LibraryTab.java
+- *change to be added*
+
+### StandardActions.java
+- *change to be added*
+
+### SaveDatabaseAction.java
+- *change to be added*
+
+### MainMenu.java
+- *change to be added*
+
+### CheckForVersionControlAction.java
+- *change to be added*
