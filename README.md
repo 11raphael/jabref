@@ -73,14 +73,14 @@ With this in mind, we have opted to include in this README the segments of code 
 ### GeneralTab.fxml (*modified*)
 - Added front-end code for preferences, used existing code as a standard to create HBox instances, and changed it appropriately.
 
-### GeneralTab.java
-- Simply c
+### GeneralTab.java (*modified*)
+- Added code using existing code as a template for setup and localisation for the preference checkbox and prompts.
 
-### GeneralTabViewModel.java
-- *change to be added*
+### GeneralTabViewModel.java (*modified*)
+- Added simple boolean/ string properties to store preferences.
 
-### JabRef_en.properties
-- *change to be added*
+### JabRef_en.properties (*modified*)
+- Added all necessary localisation.
 
 
 
