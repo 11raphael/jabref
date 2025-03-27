@@ -61,20 +61,13 @@ With this in mind, we have opted to include in this README the segments of code 
 
 ## Jiewu's Files
 ### LibraryTab.java
-- *change to be added*
-
-### StandardActions.java
-- *change to be added*
+- *sadfadfasdfa*
 
 ### DialogNotificationService.java
-- *change to be added*
+- *Implements the NotificationService interface，This class allows the logic layer to send messages to the user through the GUI without directly depending on GUI components.*
 
 ### NotificationService.java
-- *change to be added*
-
-### BibDatabaseContext.java
-- *change to be added*
-
+- *An interface has 2 methods notify and showErrorDialogThrough this interface, JabRef's core logic can communicate information to users without needing to know how these messages are displayed, making the code more maintainable and testable.*
 
 ## Sihas's Files
 ### MainMenu.java (*modified*)
@@ -98,6 +91,5 @@ Note:- JabRef has stated that they do not expect testing to be done for GUI comp
 - GitPullActionTest.java
 - GitPushActionTest.java
 - GitPreferencesTest.java
-- GitStatusTesterTest.java
 - CheckForVersionControlActionEndToEndTest.java
 
