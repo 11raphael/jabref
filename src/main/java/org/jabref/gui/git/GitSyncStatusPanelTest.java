@@ -1,261 +1,151 @@
-package org.jabref.logic.git;
+package org.jabref.gui.git;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
-import java.util.Optional;
-
-import org.jabref.model.database.BibDatabaseContext;
-
+import org.eclipse.jgit.api.FetchCommand;
 import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.lib.ObjectId;
+import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.revwalk.RevWalk;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
+
+import javax.swing.JLabel;
+import java.io.File;
+import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.*;
 
-class GitStatusTesterTest {
+class GitSyncStatusPanelTest {
 
-    @TempDir
-    Path tempDir;
-
-    @TempDir
-    Path nonGitTempDir;
-
-    private GitHandler gitHandler;
+    private Git mockGit;
+    private Repository mockRepo;
+    private RevWalk mockWalk;
 
     @BeforeEach
-    void setUp() {
-        gitHandler = new GitHandler(tempDir, true);
+    void setUp() throws Exception {
+        mockGit = mock(Git.class);
+        mockRepo = mock(Repository.class);
+        mockWalk = mock(RevWalk.class);
+
+        when(mockGit.getRepository()).thenReturn(mockRepo);
     }
 
     @Test
-    @DisplayName("Test Git repository initialization and detection")
-    void gitRepositoryInitialization() {
-        assertTrue(gitHandler.isGitRepository());
+    @DisplayName("Returns synchronized when local and remote commits are equal")
+    void testSynchronizedStatus() throws Exception {
+        ObjectId commitId = ObjectId.fromString("0123456789012345678901234567890123456789");
+
+        when(mockRepo.getBranch()).thenReturn("main");
+        when(mockRepo.resolve("refs/heads/main")).thenReturn(commitId);
+        when(mockRepo.resolve("refs/remotes/origin/main")).thenReturn(commitId);
+
+        mockFetch();
+
+        String result = invokeCheckSyncStatus(mockGit);
+        assertEquals("✅ Synchronized", result);
     }
 
     @Test
-    @DisplayName("Test status of untracked files")
-    void untrackedFileStatus() throws IOException {
-        Path untrackedFile = tempDir.resolve("untracked.txt");
-        Files.writeString(untrackedFile, "This is an untracked file");
-        Optional<GitHandler.GitStatus> status = gitHandler.getFileStatus(untrackedFile);
-        assertTrue(status.isPresent());
-        assertEquals(GitHandler.GitStatus.UNTRACKED, status.get());
+    @DisplayName("Returns ahead when local is ahead of remote")
+    void testAheadStatus() throws Exception {
+        ObjectId local = ObjectId.fromString("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+        ObjectId remote = ObjectId.fromString("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb");
+
+        RevCommit localCommit = mock(RevCommit.class);
+        RevCommit remoteCommit = mock(RevCommit.class);
+
+        when(mockRepo.getBranch()).thenReturn("main");
+        when(mockRepo.resolve("refs/heads/main")).thenReturn(local);
+        when(mockRepo.resolve("refs/remotes/origin/main")).thenReturn(remote);
+
+        mockFetch();
+        whenNewRevWalk(local, remote, localCommit, remoteCommit, 2, 0);
+
+        String result = invokeCheckSyncStatus(mockGit);
+        assertEquals("🔼 Ahead: Local branch has un-pushed commits.", result);
     }
 
     @Test
-    @DisplayName("Test status of staged files")
-    void stagedFileStatus() throws IOException, GitAPIException {
-        Path initialFile = tempDir.resolve("initial.txt");
-        Files.writeString(initialFile, "Initial commit file");
-        try (Git git = Git.open(tempDir.toFile())) {
-            git.add().addFilepattern(initialFile.getFileName().toString()).call();
-        }
-        gitHandler.createCommitOnCurrentBranch("Initial commit", false);
+    @DisplayName("Returns behind when local is behind remote")
+    void testBehindStatus() throws Exception {
+        ObjectId local = ObjectId.fromString("cccccccccccccccccccccccccccccccccccccccc");
+        ObjectId remote = ObjectId.fromString("dddddddddddddddddddddddddddddddddddddddd");
 
-        Path stagedFile = tempDir.resolve("staged.txt");
-        Files.writeString(stagedFile, "This is a staged file");
-        try (Git git = Git.open(tempDir.toFile())) {
-            git.add().addFilepattern(stagedFile.getFileName().toString()).call();
-        }
-        Optional<GitHandler.GitStatus> status = gitHandler.getFileStatus(stagedFile);
-        assertTrue(status.isPresent());
-        assertEquals(GitHandler.GitStatus.STAGED, status.get());
+        RevCommit localCommit = mock(RevCommit.class);
+        RevCommit remoteCommit = mock(RevCommit.class);
+
+        when(mockRepo.getBranch()).thenReturn("main");
+        when(mockRepo.resolve("refs/heads/main")).thenReturn(local);
+        when(mockRepo.resolve("refs/remotes/origin/main")).thenReturn(remote);
+
+        mockFetch();
+        whenNewRevWalk(local, remote, localCommit, remoteCommit, 0, 3);
+
+        String result = invokeCheckSyncStatus(mockGit);
+        assertEquals("🔽 Behind: Local branch is missing remote commits.", result);
     }
 
     @Test
-    @DisplayName("Test status of modified files")
-    void modifiedFileStatus() throws IOException, GitAPIException {
-        Path modifiedFile = tempDir.resolve("modified.txt");
-        Files.writeString(modifiedFile, "This file will be modified");
-        try (Git git = Git.open(tempDir.toFile())) {
-            git.add().addFilepattern(modifiedFile.getFileName().toString()).call();
-        }
-        gitHandler.createCommitOnCurrentBranch("Add file for modification", false);
+    @DisplayName("Returns diverged when both ahead and behind")
+    void testDivergedStatus() throws Exception {
+        ObjectId local = ObjectId.fromString("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
+        ObjectId remote = ObjectId.fromString("ffffffffffffffffffffffffffffffffffffffff");
 
-        Files.writeString(modifiedFile, "\nThis is modified content", StandardOpenOption.APPEND);
-        Optional<GitHandler.GitStatus> status = gitHandler.getFileStatus(modifiedFile);
-        assertTrue(status.isPresent());
-        assertEquals(GitHandler.GitStatus.MODIFIED, status.get());
+        RevCommit localCommit = mock(RevCommit.class);
+        RevCommit remoteCommit = mock(RevCommit.class);
+
+        when(mockRepo.getBranch()).thenReturn("main");
+        when(mockRepo.resolve("refs/heads/main")).thenReturn(local);
+        when(mockRepo.resolve("refs/remotes/origin/main")).thenReturn(remote);
+
+        mockFetch();
+        whenNewRevWalk(local, remote, localCommit, remoteCommit, 2, 2);
+
+        String result = invokeCheckSyncStatus(mockGit);
+        assertEquals("⚠️ Diverged: Local and remote branches have different changes.", result);
     }
 
     @Test
-    @DisplayName("Test status of committed files")
-    void committedFileStatus() throws IOException, GitAPIException {
-        Path committedFile = tempDir.resolve("committed.txt");
-        Files.writeString(committedFile, "This is a committed file");
-        try (Git git = Git.open(tempDir.toFile())) {
-            git.add().addFilepattern(committedFile.getFileName().toString()).call();
-        }
-        gitHandler.createCommitOnCurrentBranch("Add committed file", false);
-        Optional<GitHandler.GitStatus> status = gitHandler.getFileStatus(committedFile);
-        assertTrue(status.isPresent());
-        assertEquals(GitHandler.GitStatus.COMMITTED, status.get());
+    @DisplayName("Returns error if commits can't be resolved")
+    void testErrorStatusIfCannotResolve() throws Exception {
+        when(mockRepo.getBranch()).thenReturn("main");
+        when(mockRepo.resolve(anyString())).thenReturn(null);
+
+        mockFetch();
+
+        String result = invokeCheckSyncStatus(mockGit);
+        assertEquals("⚠️ Error: Could not resolve branch commits.", result);
     }
 
-    @Test
-    @DisplayName("BibDatabaseContext.getGitStatus integration test")
-    void bibDatabaseContextGetGitStatusTest() throws IOException, GitAPIException {
-        // Create a test file in the repository
-        Path bibFile = tempDir.resolve("database.bib");
-        Files.writeString(bibFile, "@Article{test, author={Test}}\n");
+    // ---------- Helper Methods ----------
 
-        // Add and commit the file
-        try (Git git = Git.open(tempDir.toFile())) {
-            git.add().addFilepattern(bibFile.getFileName().toString()).call();
-            git.commit().setMessage("Add test file").call();
-        }
-
-        // Setup BibDatabaseContext with the file
-        BibDatabaseContext database = new BibDatabaseContext();
-        database.setDatabasePath(bibFile);
-
-        // Test getGitStatus
-        Optional<GitHandler.GitStatus> status = database.getGitStatus();
-        assertTrue(status.isPresent());
-        assertEquals(GitHandler.GitStatus.COMMITTED, status.get());
+    private void mockFetch() throws Exception {
+        FetchCommand mockFetch = mock(FetchCommand.class);
+        when(mockGit.fetch()).thenReturn(mockFetch);
+        when(mockFetch.call()).thenReturn(null);
     }
 
-    @Test
-    @DisplayName("Test status for newly created file")
-    void getFileStatusForNewFile() throws IOException, GitAPIException {
-        Path filePath = tempDir.resolve("NewTest.txt");
-        Files.createFile(filePath);
-        Optional<GitHandler.GitStatus> status = gitHandler.getFileStatus(filePath);
-        assertTrue(status.isPresent());
-        assertEquals(GitHandler.GitStatus.UNTRACKED, status.get());
+    private void whenNewRevWalk(ObjectId local, ObjectId remote, RevCommit localCommit, RevCommit remoteCommit,
+                                int aheadCount, int behindCount) throws IOException {
+        when(mockRepo.newObjectReader()).thenReturn(null);
+        RevWalk revWalk = spy(new RevWalk(mockRepo));
+        when(mockRepo.newObjectReader()).thenReturn(revWalk.getObjectReader());
+
+        // ahead
+        when(mockWalk.parseCommit(local)).thenReturn(localCommit);
+        when(mockWalk.parseCommit(remote)).thenReturn(remoteCommit);
+        when(mockWalk.next()).thenReturn(mock(RevCommit.class)).thenReturn(null);
+
+        // Simulate different numbers of commits in each direction
+        doReturn(localCommit).when(mockWalk).parseCommit(local);
+        doReturn(remoteCommit).when(mockWalk).parseCommit(remote);
     }
 
-    @Test
-    @DisplayName("Test status for file modified after commit")
-    void getFileStatusForModifiedFile() throws IOException, GitAPIException {
-        Path filePath = tempDir.resolve("ModifiedTest.txt");
-        Files.createFile(filePath);
-        Files.writeString(filePath, "Initial content");
-
-        try (Git git = Git.open(tempDir.toFile())) {
-            git.add().addFilepattern(filePath.getFileName().toString()).call();
-        }
-        gitHandler.createCommitOnCurrentBranch("Add test file", false);
-
-        Files.writeString(filePath, "Modified content");
-        Optional<GitHandler.GitStatus> status = gitHandler.getFileStatus(filePath);
-        assertTrue(status.isPresent());
-        assertEquals(GitHandler.GitStatus.MODIFIED, status.get());
-    }
-
-    @Test
-    @DisplayName("Test Git status detection in BibDatabaseContext")
-    void bibDatabaseContextGitStatus() throws IOException, GitAPIException {
-        Path testFile = tempDir.resolve("test_database.bib");
-        Files.writeString(testFile, "@Article{test, author = {Test Author}, title = {Test Title}}");
-
-        try (Git git = Git.open(tempDir.toFile())) {
-            git.add().addFilepattern(testFile.getFileName().toString()).call();
-        }
-        gitHandler.createCommitOnCurrentBranch("Add bib file", false);
-
-        BibDatabaseContext context = new BibDatabaseContext();
-        context.setDatabasePath(testFile);
-        context.setUnderVersionControl(true);
-
-        Files.writeString(testFile, "\n@Book{test2, author = {Another Author}, title = {Another Title}}", StandardOpenOption.APPEND);
-
-        Optional<GitHandler.GitStatus> status = context.getGitStatus();
-        assertTrue(status.isPresent());
-        assertEquals(GitHandler.GitStatus.MODIFIED, status.get());
-    }
-
-    @Test
-    @DisplayName("Test isUnderVersionControl method with git repository")
-    void isUnderVersionControlWithGitRepo() throws IOException {
-        Path testFile = tempDir.resolve("version_control_test.bib");
-        Files.writeString(testFile, "@Article{test, author = {Test Author}, title = {Test Title}}");
-
-        BibDatabaseContext context = new BibDatabaseContext();
-        context.setDatabasePath(testFile);
-
-        assertTrue(context.isUnderVersionControl());
-
-        context.setUnderVersionControl(false);
-        assertFalse(context.isUnderVersionControl());
-
-        context.setUnderVersionControl(true);
-        assertTrue(context.isUnderVersionControl());
-    }
-
-    @Test
-    @DisplayName("Test isUnderVersionControl method with non-git repository")
-    void isUnderVersionControlWithNonGitRepo() throws IOException {
-        Path testFile = nonGitTempDir.resolve("non_git_test.bib");
-        Files.writeString(testFile, "@Article{test, author = {Test Author}, title = {Test Title}}");
-
-        BibDatabaseContext context = new BibDatabaseContext();
-        context.setDatabasePath(testFile);
-
-        assertFalse(context.isUnderVersionControl());
-
-        context.setUnderVersionControl(true);
-        assertTrue(context.isUnderVersionControl());
-    }
-
-    @Test
-    @DisplayName("Test getGitStatus method with various file states")
-    void getGitStatusMethodTest() throws IOException, GitAPIException {
-        Path bibFile = tempDir.resolve("git_status_test.bib");
-        Files.writeString(bibFile, "@Article{test, author = {Test Author}, title = {Test Title}}");
-
-        try (Git git = Git.open(tempDir.toFile())) {
-            git.add().addFilepattern(bibFile.getFileName().toString()).call();
-        }
-        gitHandler.createCommitOnCurrentBranch("Add test bib file", false);
-
-        BibDatabaseContext committedContext = new BibDatabaseContext();
-        committedContext.setDatabasePath(bibFile);
-        Optional<GitHandler.GitStatus> committedStatus = committedContext.getGitStatus();
-        assertTrue(committedStatus.isPresent());
-        assertEquals(GitHandler.GitStatus.COMMITTED, committedStatus.get());
-
-        Files.writeString(bibFile, "\n@Book{modified, author = {Modified Author}, title = {Modified Title}}", StandardOpenOption.APPEND);
-        BibDatabaseContext modifiedContext = new BibDatabaseContext();
-        modifiedContext.setDatabasePath(bibFile);
-        Optional<GitHandler.GitStatus> modifiedStatus = modifiedContext.getGitStatus();
-        assertTrue(modifiedStatus.isPresent());
-        assertEquals(GitHandler.GitStatus.MODIFIED, modifiedStatus.get());
-
-        try (Git git = Git.open(tempDir.toFile())) {
-            git.add().addFilepattern(bibFile.getFileName().toString()).call();
-        }
-        BibDatabaseContext stagedContext = new BibDatabaseContext();
-        stagedContext.setDatabasePath(bibFile);
-        Optional<GitHandler.GitStatus> stagedStatus = stagedContext.getGitStatus();
-        assertTrue(stagedStatus.isPresent());
-        assertEquals(GitHandler.GitStatus.STAGED, stagedStatus.get());
-
-        Path nonExistentFile = tempDir.resolve("non_existent.bib");
-        BibDatabaseContext nonExistentContext = new BibDatabaseContext();
-        nonExistentContext.setDatabasePath(nonExistentFile);
-        Optional<GitHandler.GitStatus> nonExistentStatus = nonExistentContext.getGitStatus();
-        assertFalse(nonExistentStatus.isPresent());
-    }
-
-    @Test
-    @DisplayName("Test file status in non-Git repository")
-    void nonGitRepositoryFileStatus() throws IOException {
-        Path testFile = nonGitTempDir.resolve("test.txt");
-        Files.writeString(testFile, "Test content");
-
-        GitHandler nonGitHandler = new GitHandler(testFile, false);
-
-        assertFalse(nonGitHandler.isGitRepository());
-        Optional<GitHandler.GitStatus> status = nonGitHandler.getFileStatus(testFile);
-        assertFalse(status.isPresent());
+    private String invokeCheckSyncStatus(Git git) throws Exception {
+        var method = GitSyncStatusPanel.class.getDeclaredMethod("checkSyncStatus", Git.class);
+        method.setAccessible(true);
+        return (String) method.invoke(null, git);
     }
 }
