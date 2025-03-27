@@ -61,10 +61,12 @@ With this in mind, we have opted to include in this README the segments of code 
 
 ## Jiewu's Files
 ### LibraryTab.java
-- *sadfadfasdfa*
+- *Automatic Git Monitoring: Periodically checks Git status every 10 seconds and updates the UI without manual intervention.
+Visual Status Indicators: Displays "[Modified]" or "[Committed]" directly in tab titles, providing immediate visual feedback on file status.
+Real-time Updates: Refreshes status when database changes occur, ensuring users always see the current Git state.*
 
 ### DialogNotificationService.java
-- *Implements the NotificationService interface，This class allows the logic layer to send messages to the user through the GUI without directly depending on GUI components.*
+- *Implements the NotificationService interface, This class allows the logic layer to send messages to the user through the GUI without directly depending on GUI components.*
 
 ### NotificationService.java
 - *An interface has 2 methods notify and showErrorDialogThrough this interface, JabRef's core logic can communicate information to users without needing to know how these messages are displayed, making the code more maintainable and testable.*

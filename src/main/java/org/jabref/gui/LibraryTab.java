@@ -268,8 +268,7 @@ public class LibraryTab extends Tab {
             stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) c ->
                     updateTabTitle(changedProperty.getValue()));
         });
-
-        // Start Git status monitoring if the database is under version control
+        
         if (bibDatabaseContext.isUnderVersionControl()) {
             startGitStatusMonitoring();
         }
