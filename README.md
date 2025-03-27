@@ -18,35 +18,45 @@ JabRef is open-source software; hence, many files were changed and not created d
 With this in mind, we have opted to include in this README the segments of code in the files that we changed and added (*marked respectively*), along with a list of modified and added code for each file.
 
 ## Raphael's Files
-### GitHandler.java 
-- *change to be added*
+
+### GitHandler.java  (*modified*)
+- Added optional parameter to constructor (createRepo) so that a new repository does not have to be initialized at constructor call
+    - This was done to not disturb the existing usage of GitHandler in JabRef (namely the SLR feature)
+- Added getRepository()
+  - Returns a Repository object, of this instance's file directory, from a builder class 
 
 ### GitClientHandler.java (*added*)
-- *change to be added*
+  - Handles git client functionality
+  - Usage of git http authentication
 
-### SaveDatabaseAction.java
-- *change to be added*
+### SaveDatabaseAction.java (*modified*)
+- Added method call to GitClientHandler.postSaveDatabaseAction() to handle git functionality on database save
 
-### OpenDatabaseAction.java
-- *change to be added*
+### OpenDatabaseAction.java (*modified*)
+- Added CheckForVersionControlAction to post-open actions
 
-### CheckForVersionControlAction.java
-- *change to be added*
+### GitPullAction.java (*added*)
+- Logic for pulling from a remote repository
 
-### GitPullAction.java
-- *change to be added*
+### GitPushAction.java (*added*)
+- Logic for pushing to a remote repository
 
-### GitPushAction.java
-- *change to be added*
+### CheckForVersionControlAction.java (*added*)
+- Action which checks whether a library is under version control
+  - If git tracked, the library context is tagged as versioned
+  - If git tracked, the library is updated from the remote repository
 
-### GitPreferences.java
-- *change to be added*
+### GitPreferences.java (*added*)
+- Stores preferences for git functionality
+  - Stores GitHub username for http authentication
+  - Stores GitHub personal access token for http authentication
+  - Stores boolean for whether a library should update its remote repository when library is saved
 
-### CliPreferences.java
-- *change to be added*
+### CliPreferences.java (*modified*)
+- Added GitPreferences
 
-### JabRefCliPreferences.java
-- *change to be added*
+### JabRefCliPreferences.java (*modified*)
+- Added initialisation of GitPreferences
 
 
 ## Jiewu's Files
