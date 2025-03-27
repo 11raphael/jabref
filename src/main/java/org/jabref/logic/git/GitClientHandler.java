@@ -80,7 +80,7 @@ public class GitClientHandler extends GitHandler {
             try {
                 pushCommitsToRemoteRepository();
             } catch (IOException e) {
-                LOGGER.error("Failed to push");
+                LOGGER.error("Failed to push", e);
                 showGeneralErrorDialog();
             }
         }
@@ -107,7 +107,7 @@ public class GitClientHandler extends GitHandler {
                .setMode(ResetCommand.ResetType.HARD)
                .call();
         } catch (IOException | GitAPIException e) {
-            LOGGER.error("Failed to reset repository");
+            LOGGER.error("Failed to reset repository", e);
         }
     }
 
